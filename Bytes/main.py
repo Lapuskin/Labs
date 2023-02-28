@@ -1,9 +1,10 @@
+import math
 class ByteNum:
     def __init__(self, number=0):
-        self.__straight__ = []
-        self.__reverse__ = []
-        self.__additional__ = []
         if type(number) is int:
+            self.__straight__ = []
+            self.__reverse__ = []
+            self.__additional__ = []
             self.convert_to_straight_bytecode(number)
             self.convert_to_reverse_bytecode()
             self.convert_to_additional_bytecode()
@@ -15,10 +16,13 @@ class ByteNum:
                 self.__straight__.append(1)
                 self.__reverse__.append(1)
                 self.__additional__.append(1)
-        # elif type(number) is float:
-        # do_smth2()
+        elif type(number) is float:
+            self.mantissa = []
+            self.exponent = []
+            self.sign = 0
 
-    def convert_to_bytecode(self, number):
+
+    def convert_int_to_bytecode(self, number):
         result = []
         if number == 0:
             i = 8
@@ -39,8 +43,19 @@ class ByteNum:
                 dividend = quotient
             result.append(1)
         return result
+
+    def convert_float_to_bytecode(self, number):
+        result = []
+        for index in range(0, 5):
+            number *= 2
+            if number >= 1:
+                result.append(1)
+                number -= 1
+            else:
+                result.append(0)
+        return result.reverse()
     def convert_to_straight_bytecode(self, number):
-        self.__straight__ = self.convert_to_bytecode(number)
+        self.__straight__ = self.convert_int_to_bytecode(number)
         if len(self.__straight__) < 7:
             i = 7 - len(self.__straight__)
             while i != 0:
@@ -74,7 +89,7 @@ class ByteNum:
             result *= -1
         return result
 
-    def sum(self, other, key_self='__straight__', key_other='__straight__'):
+    def sum(self, other, key_self='__straight__', key_other='__straight__', size=8):
         if type(other) is list:
             size = max(len(self.__dict__[key_self]), len(other))
             self.__dict__[key_self] += [0] * (size - len(self.__dict__[key_self]))
@@ -97,7 +112,7 @@ class ByteNum:
                 result.append(value % 2)
             if overflow == 1:
                 result.append(1)
-            while len(result) > 8:
+            while len(result) > size:
                 result.pop()
             return result
 
@@ -192,8 +207,8 @@ class ByteNum:
 if __name__ == '__main__':
     num1 = ByteNum(5)
     num2 = ByteNum(-10)
-    num3 = num2 / num1
-    print(num3.__straight__)
-    print(num3.__reverse__)
-    print(num3.__additional__)
+    num3 = num1 + num2
+    print(num3.mantissa)
+    print(num3.exponent)
+
     print(num3.convert_to_int())
