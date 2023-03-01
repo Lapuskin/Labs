@@ -1,4 +1,5 @@
-if __name__ == '__main__':
-    print_hi('PyCharm')
+from plain import Plain
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+if __name__ == '__main__':
+    plain = Plain()
+    plain.step()
