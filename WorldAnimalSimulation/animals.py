@@ -21,20 +21,21 @@ class Animal:
                  (self.speed, 0),
                  (-self.speed, 0)]
         step = moves[random.randint(0, 3)]
-        self.x += step[0]
-        self.y += step[1]
-        return [self.x, self.y]
+        return [self.x + step[0], self.y + step[1]]
 
     def is_hurt(self, damage):
         self.hp -= damage
         if self.hp <= 0:
             print(type(self).__name__, ' ', self.x, ' ', self.y, 'was eaten')
             del self
+        else: print(type(self).__name__, ' ', self.x, ' ', self.y, 'hurted')
+
 
     def eat(self, prey):
-        if type(prey).__name__ is self.type_of_pray:
+        if isinstance(prey, self.type_of_pray):
             prey.is_hurt(self.damage)
-            self.hunger += 1
+            if self.hunger <= self.max_hunger:
+                self.hunger += 1
 
     def is_hungry(self):
         if self.hunger > 0:
@@ -62,7 +63,7 @@ class Zebra(Animal):
     damage = 1
     max_hunger = 3
     hunger = 3
-    type_of_pray = type(Plant).__name__
+    type_of_pray = Plant
 
 
 class Lion(Animal):
@@ -71,4 +72,4 @@ class Lion(Animal):
     damage = 2
     max_hunger = 3
     hunger = 3
-    type_of_pray = type(Animal).__name__
+    type_of_pray = Animal
