@@ -3,6 +3,7 @@ import math
 
 class ByteNum:
     def __init__(self, number=0):
+        self.mantissa = []
         if type(number) is int:
             self.__straight__ = []
             self.__reverse__ = []
@@ -19,17 +20,32 @@ class ByteNum:
                 self.__reverse__.append(1)
                 self.__additional__.append(1)
         elif type(number) is float:
-            self.mantissa = []
             self.exponent = []
             self.sign = 0
             if number != 0.0:
                 modify_number = math.modf(number)
                 int_bytecode = self.convert_int_to_bytecode(int(modify_number[1]))
-                float_bytecode = self.convert_float_to_bytecode(modify_number[0])
-                self.exponent = self.convert_int_to_bytecode(126 + len(int_bytecode))
-                self.mantissa = int_bytecode[1:len(int_bytecode)+1] + float_bytecode
-                while len(self.mantissa) < 24:
+                float_bytecode = self.convert_float_to_bytecode(modify_number[0], 23 - len(int_bytecode))
+                self.mantissa = float_bytecode + int_bytecode
+                exp = 0
+                exp_sign = 0
+                i = len(self.mantissa)
+                while i != 0:
+                    i -= 1
+                    exp += 1
+                    if self.mantissa[i] == 1:
+                        self.mantissa.pop()
+                        break
+                    else:
+                        exp_sign = 1
+                        self.mantissa.pop()
+                self.mantissa.reverse()
+                while len(self.mantissa) <= 22:
                     self.mantissa.append(0)
+                self.mantissa.reverse()
+                temp_exponent = 127 + (len(self.mantissa) - (len(float_bytecode) + exp))
+                self.exponent = self.convert_int_to_bytecode(temp_exponent)
+                self.exponent.append(exp_sign)
                 if number < 0:
                     self.sign = 1
 
@@ -56,16 +72,20 @@ class ByteNum:
             result.append(1)
         return result
 
-    def convert_float_to_bytecode(self, number):
+
+    def convert_float_to_bytecode(self, number, size):
         result = []
-        for index in range(0, 5):
+        for index in range(0, size):
             number *= 2
             if number >= 1:
                 result.append(1)
                 number -= 1
             else:
                 result.append(0)
+        result.reverse()
         return result
+
+
     def convert_to_straight_bytecode(self, number):
         self.__straight__ = self.convert_int_to_bytecode(number)
         if len(self.__straight__) < 7:
@@ -90,10 +110,9 @@ class ByteNum:
         self.__straight__ = self.__reverse__
         self.sum([1], '__straight__')
 
-    def convert_to_int(self, key='__straight__'):
+    def convert_to_number(self, key='__straight__'):
         index = 0
         result = 0
-        self.__dict__[key] = [1] + self.__dict__[key]
         for bit in self.__dict__[key]:
             result += bit * 2 ** index
             index += 1
@@ -101,6 +120,15 @@ class ByteNum:
         if self.__dict__[key][-1] == 1:
             result *= -1
         return result
+
+    def convert_to_int(self, key='__straight__'):
+        if self.mantissa != []:
+            exp = self.convert_to_number('exponent')
+            mantissa = self.convert_to_number('mantissa')
+            res = (-1) ** self.sign * 2 ** (exp - 127) * (1 + (mantissa / 2 ** 23))
+            return res
+        else:
+            return self.convert_to_number(key)
 
     def sum(self, other, key_self='__straight__', key_other='__straight__', size=8):
         if type(other) is list:
@@ -129,7 +157,7 @@ class ByteNum:
                 result.pop()
             return result
 
-    def first_is_biger(self, self_code, other_code):
+    def first_is_bigger(self, self_code, other_code):
         index = len(self_code) - 1
         while index != 0:
             index -= 1
@@ -139,7 +167,7 @@ class ByteNum:
                 return True
 
     def __add__(self, other):
-        if self.mantissa ==[]:
+        if self.mantissa == []:
             res = ByteNum(1)
             if self.__straight__[-1] == other.__straight__[-1]:
                 res.__straight__ = self.sum(other)
@@ -147,7 +175,7 @@ class ByteNum:
                 res.convert_to_reverse_bytecode()
                 res.convert_to_additional_bytecode()
             elif self.__straight__[-1] == 0:
-                if self.first_is_biger(self.__straight__, other.__straight__):
+                if self.first_is_bigger(self.__straight__, other.__straight__):
                     res.__straight__ = self.sum(other, '__straight__', '__additional__')
                     res.convert_to_reverse_bytecode()
                     res.convert_to_additional_bytecode()
@@ -158,7 +186,7 @@ class ByteNum:
                     res.__straight__[-1] = 1
                     res.__reverse__[-1] = 1
             else:
-                if self.first_is_biger(self.__straight__, other.__straight__):
+                if self.first_is_bigger(self.__straight__, other.__straight__):
                     res.__additional__ = self.sum(other, '__additional__', '__straight__')
                     res.unconvert_additional_bytecode()
                     res.__additional__[-1] = 1
@@ -175,12 +203,14 @@ class ByteNum:
         else:
             if self.exponent == other.exponent:
                 res = ByteNum(0.0)
-                res.exponent = self.exponent
-                res.mantissa = self.sum(other, 'mantissa', 'mantissa', 24)
+                res.exponent = other.exponent
+                res.mantissa = self.sum(other, 'mantissa', 'mantissa', 23)
                 return res
+
 
     def __sub__(self, other):
         return self + -other
+
 
     def __mul__(self, other):
         result = ByteNum(0)
@@ -197,6 +227,7 @@ class ByteNum:
                 result = result + self
             return result
 
+
     def __truediv__(self, other):
         if self.__straight__[-1] != other.__straight__[-1]:
             result = ByteNum(-1)
@@ -205,7 +236,7 @@ class ByteNum:
         quotient = 0
         last_result = ByteNum(123)
         temp_result = self
-        while self.first_is_biger(last_result.__straight__, temp_result.__straight__):
+        while self.first_is_bigger(last_result.__straight__, temp_result.__straight__):
             last_result = ByteNum(0)
             last_result = last_result + temp_result
             temp_result.__straight__ = temp_result.sum(other, '__straight__', '__additional__')
@@ -217,6 +248,7 @@ class ByteNum:
         result.__additional__[-1] = result.__reverse__[-1]
         return result
 
+
     def __neg__(self):
         self.__straight__[-1] = abs(self.__straight__[-1] - 1)
         self.__reverse__[-1] = abs(self.__straight__[-1] - 1)
@@ -226,8 +258,17 @@ class ByteNum:
 
 if __name__ == '__main__':
     num1 = ByteNum(3.14)
-    num2 = ByteNum(2.86)
+    num2 = ByteNum(3.14)
+    print(num1.mantissa)
+    print(num1.exponent)
+    print(num1.convert_to_int())
+
+    print(num2.mantissa)
+    print(num2.exponent)
+    print(num2.convert_to_int())
+
     num3 = num1 + num2
-    print(num3.mantissa)
     print(num3.exponent)
-    print(num3.convert_to_int('mantissa'))
+    print(num3.convert_to_int())
+    num3.mantissa.reverse()
+    print(num3.mantissa)
