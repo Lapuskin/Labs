@@ -13,7 +13,7 @@ class Animal:
     damage = 1
     max_hunger = 3
     hunger = 3
-    type_of_pray = 'Animal'
+    type_of_pray = None
 
     def walk(self):
         moves = [(0, self.speed),
@@ -30,12 +30,13 @@ class Animal:
             del self
         else: print(type(self).__name__, ' ', self.x, ' ', self.y, 'hurted')
 
-
     def eat(self, prey):
-        if isinstance(prey, self.type_of_pray):
+        if issubclass(type(prey), self.type_of_pray):
             prey.is_hurt(self.damage)
             if self.hunger <= self.max_hunger:
                 self.hunger += 1
+        else:
+            print(self, type(prey), self.type_of_pray)
 
     def is_hungry(self):
         if self.hunger > 0:

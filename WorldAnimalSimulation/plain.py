@@ -11,12 +11,12 @@ class Plain:
     plants = []
     serializer = Serializer()
 
-
     def init(self):
         for row in range(self.steppes_size):
             self.grid.append([])
             for column in range(self.steppes_size):
                 self.grid[row].append(Place(row, column))
+
     def start(self):
         self.init()
         self.print()

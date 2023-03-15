@@ -8,14 +8,13 @@ plain = Plain()
 def start():
     plain.start()
 
-
 def step():
     plain.step()
 
 
 def add(essence, x, y):
     print(x, y)
-    plain.add(essence, int(x), int(y))
+    plain.add(essence, x, y)
 
 
 def remove(x, y):
