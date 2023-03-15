@@ -44,7 +44,8 @@ class Animal:
             self.hp -= 1
             if self.hp <= 0:
                 print(type(self).__name__, ' ', self.x, ' ', self.y, 'died of hunger')
-                del self
+                return True
+            return False
 
     def aging(self):
         self.hp -= 1
@@ -61,8 +62,8 @@ class Zebra(Animal):
     speed = 2
     hp = 3
     damage = 1
-    max_hunger = 3
-    hunger = 3
+    max_hunger = 5
+    hunger = 5
     type_of_pray = Plant
 
 

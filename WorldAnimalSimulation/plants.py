@@ -3,10 +3,18 @@ class Plant:
         self.x = x
         self.y = y
 
+    fresh = 7
     hp = 1
 
-    def was_eaten(self, damage):
+    def is_hurt(self, damage):
         self.hp -= damage
         if self.hp <= 0:
-            print(type(self), ' ', self.x, ' ', self.y, 'was eaten')
+            print(type(self).__name__, ' ', self.x, ' ', self.y, 'was eaten')
+            del self
+
+    def aging(self):
+        self.fresh -= 1
+        if self.fresh <= 0:
+            self.hp = self.fresh
+            print(type(self).__name__, ' ', self.x, ' ', self.y, 'is gone')
             del self
