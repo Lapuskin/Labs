@@ -35,8 +35,6 @@ class Animal:
             prey.is_hurt(self.damage)
             if self.hunger <= self.max_hunger:
                 self.hunger += 1
-        else:
-            print(self, type(prey), self.type_of_pray)
 
     def is_hungry(self):
         if self.hunger > 0:
@@ -57,7 +55,6 @@ class Animal:
     def reproduce(self, target):
         if type(self).__name__ == type(target).__name__ & self.hunger == self.max_hunger:
             pass
-
 
 class Zebra(Animal):
     speed = 2
