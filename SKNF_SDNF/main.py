@@ -8,7 +8,7 @@ def main():
     tree.build()
     table = Table_of_truth()
     table.build(tree)
-    table.print()
+    #table.print()
 
 if __name__ == '__main__':
     main()

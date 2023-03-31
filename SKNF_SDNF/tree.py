@@ -9,6 +9,7 @@ class Tree:
     priority = ['!', '+', '*']
     root = None
     variables = []
+    operations = []
 
     def build(self):
         self.root = self.find_inflection_point(self.tokens, None)
@@ -45,7 +46,10 @@ class Tree:
         else:
             lexeme = Var()
             self.variables.append(lexeme)
+            lexeme.set_expression(tokens)
             return lexeme
+        lexeme.set_expression(tokens)
+        self.operations.append(lexeme)
         lexeme.parent = parent
         left_lexeme = tokens[:inflection_place]
         right_lexeme = tokens[inflection_place + 1:]
@@ -55,3 +59,5 @@ class Tree:
 
     def calc(self):
         return self.root.calc()
+
+
