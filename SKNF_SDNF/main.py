@@ -8,7 +8,10 @@ def main():
     tree.build()
     table = Table_of_truth()
     table.build(tree)
-    #table.print()
+    table.create_sknf_form()
+    table.create_sdnf_form()
+    table.create_index()
+
 
 if __name__ == '__main__':
     main()
