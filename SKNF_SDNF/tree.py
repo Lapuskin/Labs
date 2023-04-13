@@ -6,11 +6,12 @@ class Tree:
     def __init__(self, expression):
         self.tokens = re.findall(r'\d+|[()+*!]|[A-Z]', expression)
 
+    values = {}
     priority = ['!', '+', '*']
     root = None
     variables = []
     operations = []
-
+    variable_number = 0
     def build(self):
         self.root = self.find_inflection_point(self.tokens, None)
         print('end')
@@ -49,11 +50,14 @@ class Tree:
         else:
             lexeme = Var()
             lexeme.set_expression(tokens)
-            for lex in self.variables:
-                if lexeme.expression == lex.expression:
+            for var in self.variables:
+                if lexeme.expression == var.expression:
+                    self.variables.append(lexeme)
                     return lexeme
+            self.values[str(tokens)] = None
             self.variables.append(lexeme)
             return lexeme
+
         lexeme.set_expression(tokens)
         self.operations.append(lexeme)
         lexeme.parent = parent
@@ -64,4 +68,7 @@ class Tree:
         return lexeme
 
     def calc(self):
+        for var in self.variables:
+            value = self.values[str(var.expression)]
+            var.set_value(value)
         return self.root.calc()
