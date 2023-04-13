@@ -3,7 +3,7 @@ from tree import Tree
 
 
 def main():
-    expression = "A * (B + !C)"
+    expression = "!((A+B)*(B+C))"
     tree = Tree(expression)
     tree.build()
     table = Table_of_truth()

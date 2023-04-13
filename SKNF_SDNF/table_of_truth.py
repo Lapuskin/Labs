@@ -11,7 +11,7 @@ class Table_of_truth:
 
     def build(self, tree):
         self.tree = tree
-        self.rows_size = 1 + 2 ** len(tree.operations)
+        self.rows_size = 1 + 2 ** len(tree.variables)
         self.columns_size = len(tree.operations) + len(tree.variables)
         self.matrix = []
         for i in range(0, self.rows_size):

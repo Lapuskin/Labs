@@ -18,16 +18,19 @@ class Tree:
     def find_inflection_point(self, tokens, parent):
         if not tokens:
             return None
+        if tokens[-1] == ')' and tokens[0] == '(':
+            tokens.pop(-1)
+            tokens.pop(0)
         self_priority = 0
         max_priority = 0
         inflection_place = 0
         offset = 0
         for i in range(0, len(tokens) - 1):
             if tokens[i] == '(':
-                offset -= 1
+                offset -= 3
                 self_priority = 0
             elif tokens[i] == ')':
-                offset += 1
+                offset += 3
                 self_priority = 0
             elif tokens[i] in self.priority:
                 self_priority = self.priority.index(tokens[i]) + offset + 1
@@ -45,8 +48,11 @@ class Tree:
             lexeme = Not()
         else:
             lexeme = Var()
-            self.variables.append(lexeme)
             lexeme.set_expression(tokens)
+            for lex in self.variables:
+                if lexeme.expression == lex.expression:
+                    return lexeme
+            self.variables.append(lexeme)
             return lexeme
         lexeme.set_expression(tokens)
         self.operations.append(lexeme)
@@ -59,5 +65,3 @@ class Tree:
 
     def calc(self):
         return self.root.calc()
-
-
