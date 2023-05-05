@@ -1,4 +1,5 @@
-from kivy.uix.anchorlayout import AnchorLayout
+from controller import Controller
+
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.relativelayout import RelativeLayout
@@ -11,38 +12,45 @@ from kivy.metrics import dp
 
 
 class View:
+    controller = Controller()
 
-    def send_trip(self, instance, input_departure, input_arrival,
-                    input_date_departure, input_date_arrival):
+    class MyPopup(Popup):
+        def __init__(self):
+            add_popup_layout = BoxLayout(orientation='vertical', spacing='10')
+            input_departure = TextInput()
+            input_arrival = TextInput()
+            input_date_departure = TextInput()
+            input_date_arrival = TextInput()
+            submit_button = Button(text='Добавить')
+            submit_button.bind(on_press=self.send_trip)
+            add_popup_layout.add_widget(Label(text='Введите станцию отправления'))
+            add_popup_layout.add_widget(input_departure)
+            add_popup_layout.add_widget(Label(text='Введите станцию прибытия'))
+            add_popup_layout.add_widget(input_arrival)
+            add_popup_layout.add_widget(Label(text='Введите дату и время отправления'))
+            add_popup_layout.add_widget(input_date_departure)
+            add_popup_layout.add_widget(Label(text='Введите дату и время прибытия'))
+            add_popup_layout.add_widget(input_date_arrival)
+            add_popup_layout.add_widget(submit_button)
+            popup = Popup(title='Добавить рейс', content=add_popup_layout, size_hint=(None, None), size=(300, 450))
+            popup.open()
+
+    def set_app(self, App):
+        self.app = App
+
+    def send_trip(self, instance):
         trip = []
-        trip.append(input_departure)
-        trip.append(input_arrival)
-        trip.append(input_date_departure)
-        trip.append(input_date_arrival)
+        trip.append(self.input_departure)
+        trip.append(self.input_arrival)
+        trip.append(self.input_date_departure)
+        trip.append(self.input_date_arrival)
         self.controller.add_trip(trip)
-
+        self.update_frame(self.controller.get_app())
 
     def add_trip(self, instance):
-        add_popup_layout = BoxLayout(orientation='vertical', spacing='10')
-        input_departure = TextInput()
-        input_arrival = TextInput()
-        input_date_departure = TextInput()
-        input_date_arrival = TextInput()
-        submit_button = Button(text='Добавить')
-        submit_button.bind(on_press=self.send_trip)
-        add_popup_layout.add_widget(Label(text='Введите станцию отправления'))
-        add_popup_layout.add_widget(input_departure)
-        add_popup_layout.add_widget(Label(text='Введите станцию прибытия'))
-        add_popup_layout.add_widget(input_arrival)
-        add_popup_layout.add_widget(Label(text='Введите дату и время отправления'))
-        add_popup_layout.add_widget(input_date_departure)
-        add_popup_layout.add_widget(Label(text='Введите дату и время прибытия'))
-        add_popup_layout.add_widget(input_date_arrival)
-        add_popup_layout.add_widget(submit_button)
-        popup = Popup(title='Добавить рейс', content=add_popup_layout, size_hint=(None, None), size=(300, 450))
-        popup.open()
 
     def update_frame(self, app, trips):
+        self.controller.set_app(self.app)
         layout = RelativeLayout()
         app.data_tables = MDDataTable(
             size_hint=(0.8, 0.8),

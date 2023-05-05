@@ -1,6 +1,7 @@
 from kivy.config import Config
 
 from controller import Controller
+from view import View
 
 Config.set("graphics", "width", 1250)
 Config.set("graphics", "height", 1000)
@@ -13,9 +14,11 @@ class MyApp(MDApp):
     def build(self):
         self.theme_cls.theme_style = "Dark"
         self.theme_cls.primary_palette = "Orange"
-        controller = Controller(self)
-        return controller.start_build()
-
+        view = View()
+        view.set_app(self)
+        controller = Controller()
+        controller.set_app(self)
+        return view.update_frame(self, controller.get_trips())
 
 if __name__ == '__main__':
     MyApp().run()
