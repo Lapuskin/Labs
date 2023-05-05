@@ -1,4 +1,3 @@
-
 def main():
     '''    expression_table = [["A", "B", "C", "F"],
                         [ 0,   0,   0,   0],
@@ -11,20 +10,64 @@ def main():
                         [ 1,   1,   1,   1]]
     '''
     expression_table = [["A", "B", "C", "F"],
-                        [ 0,   0,   0,   0],
-                        [ 0,   0,   1,   0],
-                        [ 0,   1,   0,   1],
-                        [ 0,   1,   1,   1],
-                        [ 1,   0,   0,   0],
-                        [ 1,   0,   1,   1],
-                        [ 1,   1,   0,   1],
-                        [ 1,   1,   1,   1]]
+                        [0, 0, 0, 0],
+                        [0, 0, 1, 0],
+                        [0, 1, 0, 1],
+                        [0, 1, 1, 1],
+                        [1, 0, 0, 0],
+                        [1, 0, 1, 1],
+                        [1, 1, 0, 1],
+                        [1, 1, 1, 1]]
     mini(expression_table)
 
+
 def mini(table):
-    makklasky(table, 0)
+    makklasky(table, 1)
     print(' ')
-    karno(table, 0)
+    karno(table, 1)
+    print(' ')
+    analytik(table, 1)
+
+
+
+def analytik(table, bool_val):
+        snf = create_snf(table, bool_val)
+        min_snf = []
+        if snf:
+            for cur_kit_place in range(len(snf)):
+                for mapping_kit_place in range(1, len(snf)):
+                    counter = 0
+                    kit = []
+                    for i in range(len(snf[0])):
+                        for j in range(len(snf[0])):
+                            if snf[cur_kit_place][i] == snf[mapping_kit_place][j]:
+                                counter += 1
+                                kit.append(snf[cur_kit_place][i])
+                    if counter == len(snf[cur_kit_place]) - 1:
+                        min_snf.append(kit)
+        for kit in min_snf:
+            print(kit, end='')
+            print('+', end='')
+
+
+
+
+
+def create_snf(table, bool_val):
+    snf = []
+
+    for i in range(1, len(table)):
+        kit = []
+        if table[i][-1] is bool_val:
+            for j in range(len(table[0]) - 1):
+                if table[i][j] != bool_val:
+                    kit.append('~'+table[0][j])
+                else:
+                    kit.append(table[0][j])
+            snf.append(kit)
+    return snf
+
+
 
 def partition(table, bool_val):
     constituents = []
@@ -39,14 +82,15 @@ def partition(table, bool_val):
             constituents.append(constituent)
     return constituents
 
+
 def karno(table, bool_val):
-    #создание карты
+    # создание карты
     map = []
     variables_count = len(table[0]) - 1
     vars_left = variables_count % 2
     vars_top = variables_count - (variables_count % 2)
-    map_row_size = 2**vars_left + 1
-    map_column_size = 2**vars_top + 1
+    map_row_size = 2 ** vars_left + 1
+    map_column_size = 2 ** vars_top + 1
 
     clasters = partition(table, bool_val)
 
@@ -66,12 +110,12 @@ def karno(table, bool_val):
         for j in range(map_column_size - 1):
             map[i].append(0)
 
-    for i in range(map_row_size-1):
-        for j in range(map_column_size-1):
+    for i in range(map_row_size - 1):
+        for j in range(map_column_size - 1):
             if top_gray_code[j] + left_gray_code[i] in clasters:
                 map[i][j] = 1
 
-    selected_area = [[],[]]
+    selected_area = [[], []]
     counter = 0
     for i in range(map_row_size - 1):
         for j in range(map_column_size - 1):
@@ -84,28 +128,43 @@ def karno(table, bool_val):
 
     for i in range(map_row_size - 1):
         for j in range(map_column_size - 1):
-            if map[i][j] == 1 & map[i-1][j] == 1 & map[i-1][j-1] == 1 & map[i][j-1] == 1:
-                square = {(i,j), (abs(i-1), j), (abs(i-1), abs(j-1)), (i, abs(j-1))}
+            if map[i][j] == 1 & map[i - 1][j] == 1 & map[i - 1][j - 1] == 1 & map[i][j - 1] == 1:
+                dif_i = i
+                dif_j = j
+                if i - 1 < 0:
+                    dif_i += map_row_size - 1
+                if j - 1 < 0:
+                    dif_j += map_column_size - 1
+                square = {(i, j), (dif_i - 1, j), (dif_i - 1, dif_j - 1), (i, dif_j - 1)}
                 selected_area[0].append(square)
 
     for i in range(map_row_size - 1):
         for j in range(map_column_size - 1):
             if map[i][j] == 1 & map[i - 1][j] == 1:
-                rect = {(i,j),(abs(i-1), j)}
+                dif_i = i
+                if i-1 < 0:
+                    dif_i += map_row_size - 1
+                rect = {(i, j), (dif_i - 1, j)}
                 selected_area[1].append(rect)
-            elif map[i][j] == 1 & map[i][j - 1] == 1:
-                rect = {(i, j),(i,abs(j-1))}
+            if map[i][j] == 1 & map[i][j - 1] == 1:
+                dif_j = j
+                if j-1 < 0:
+                    dif_j += map_column_size - 1
+                rect = {(i, j), (i, dif_j - 1)}
                 selected_area[1].append(rect)
-    min_selected_area = [[],[]]
+    min_selected_area = [[], []]
     for layer in range(len(selected_area)):
         for figure in selected_area[layer]:
             if figure not in min_selected_area[layer]:
                 min_selected_area[layer].append(figure)
-    selected_area = [min_selected_area[0],[]]
-    for square in min_selected_area[0]:
-        for rect in min_selected_area[1]:
-            if not rect <= square:
-                selected_area[1].append(rect)
+    selected_area = [min_selected_area[0], []]
+    if min_selected_area[0]:
+        for square in min_selected_area[0]:
+            for rect in min_selected_area[1]:
+                if not rect <= square:
+                    selected_area[1].append(rect)
+    else:
+        selected_area[1] = min_selected_area[1]
 
     for layer in selected_area:
         for figure in layer:
@@ -128,14 +187,16 @@ def karno(table, bool_val):
                 if priority[i] == max:
                     if cur_block[i] != bool_val:
                         print("~", end='')
-                    print(table[0][i],end='')
-            print('+',end='')
+                    print(table[0][i], end='')
+            print('+', end='')
+
 
 def gray_code(n):
     if n == 0:
         return ['']
-    lower_gray = gray_code(n-1)
-    return ['0'+code for code in lower_gray] + ['1'+code for code in reversed(lower_gray)]
+    lower_gray = gray_code(n - 1)
+    return ['0' + code for code in lower_gray] + ['1' + code for code in reversed(lower_gray)]
+
 
 def makklasky(table, bool_val):
     constituents = []
@@ -147,7 +208,7 @@ def makklasky(table, bool_val):
         constituents_layers.append([])
         iplicants_layer.append([])
     iplicants_layer.pop()
-    #разбиение на конституэнты и по слоям
+    # разбиение на конституэнты и по слоям
 
     constituents = partition(table, bool_val)
 
@@ -165,7 +226,8 @@ def makklasky(table, bool_val):
                     ineq_count = 0
                     place = 0
                     for element in range(column_size - 1):
-                        if constituents_layers[layer_number][i][element] != constituents_layers[layer_number + 1][j][element]:
+                        if constituents_layers[layer_number][i][element] != constituents_layers[layer_number + 1][j][
+                            element]:
                             place = element
                             ineq_count += 1
                     if ineq_count == 1:
@@ -178,7 +240,7 @@ def makklasky(table, bool_val):
             final_iplicants.append(layer[0])
         elif len(layer) > 1:
             for i in range(len(layer)):
-                for j in range(i+1, len(layer)):
+                for j in range(i + 1, len(layer)):
                     for sign in range(column_size - 1):
                         if layer[i][sign] != layer[j][sign]:
                             final_iplicants.append(layer[i].copy())
@@ -196,14 +258,15 @@ def makklasky(table, bool_val):
             if iplicant[element] != bool_val:
                 if iplicant[element] != "*":
                     elem = table[0][element]
-                    print("(~"+elem+")", end='')
+                    print("(~" + elem + ")", end='')
             else:
                 print(table[0][element], end='')
 
         if bool_val == 1:
-            print("+",end='')
+            print("+", end='')
         else:
-            print("*",end='')
+            print("*", end='')
+
 
 if __name__ == '__main__':
     main()
