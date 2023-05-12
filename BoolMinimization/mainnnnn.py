@@ -1,13 +1,22 @@
+from table_of_truth import Table_of_truth
+from tree import Tree
+
 
 def main():
-    #mini(expression_table)
+    expression = "!((A+B)*(B+C))"
+    tree = Tree(expression)
+    tree.build()
+    table = Table_of_truth()
+    table.build(tree)
+    table.create_min_table()
+    mini(table.min_table, table.expression)
 
 def mini(table, func):
-    makklasky(table, 0)
+    makklasky(table, 1)
     print(' ')
-    karno(func, table, 0)
+    karno(func, table, 1)
     print(' ')
-    analytik(table, 0)
+    analytik(table, 1)
 
 
 def analytik(table, bool_val):
@@ -166,11 +175,16 @@ def karno(func, table, bool_val):
                 for i in range(len(priority)):
                     if priority[i] == max:
                         if cur_block[i] != bool_val:
+                            print("(", end='')
                             print("~", end='')
-                        print(table[0][i], end='')
+                            print(table[0][i], end='')
+                            print(")", end='')
+                        else:
+                            print(table[0][i], end='')
                 print('*', end='')
     else:
-        return func
+        print(func)
+    print()
 
 def gray_code(n):
     if n == 0:
@@ -248,6 +262,8 @@ def makklasky(table, bool_val):
             print("+", end='')
         else:
             print("*", end='')
+    print()
+
 
 def print_map(map, row, column):
     print("Karnaugh Map:")
