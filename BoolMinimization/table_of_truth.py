@@ -31,7 +31,7 @@ class Table_of_truth:
         self.min_table = []
         for i in range(len(self.table)):
             self.min_table.append([])
-            for j in range(len(self.tree.variables)-1):
+            for j in range(len(self.tree.variables)):
                 if i != 0:
                     self.min_table[i].append(int(self.table[i][j]))
                 else:
@@ -46,7 +46,7 @@ class Table_of_truth:
 
     def print_min_table(self):
         for row in range(self.rows_size):
-            for column in range(len(self.tree.variables)):
+            for column in range(len(self.tree.variables) +1):
                 print(self.min_table[row][column], end=' | ')
             print()
         print()
@@ -137,9 +137,23 @@ class Table_of_truth:
             self.num_sdnf.append(convert_to_number(byte_num))
             self.sdnf_form += '+'
 
-        print(self.sdnf_form)
-        print(self.num_sdnf)
-        print(self.bytes_sdnf)
+        return self.format_sdnf(self.bytes_sdnf)
+
+
+    def format_sdnf(self, lst):
+        result = ""
+        for i in lst:
+            result +="( "
+            for j in range(len(i)):
+                if i[j] == 0:
+                    result += "!x" + str(j+1) + " * "
+                else:
+                    result += "x" + str(j+1) + " * "
+            result = result[:-2]
+            result += ")+"
+        return result[:-2]  # удаляем последний "+" из строки
+
+    # ( !x1 * !x2 * !x3 )+( !x1 * !x2 * x3 )+( !x1 * x2 * x3 )+( x1 * x2 * x3 )
 
     def create_index(self):
         for row in range(1, self.rows_size):
