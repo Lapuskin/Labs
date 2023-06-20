@@ -3,12 +3,12 @@ import random
 
 from matrix import Matrix
 
-WORD_LEN = 6
-DISCHARGE_LEN = 6
+WORD_LEN = 16
+DISCHARGE_LEN = 16
 SERACH_WORD_INDEX = 1
 TOP_LINE = 7
 BOTTOM_LINE = 2
-NEW_WORD = [0, 0, 0, 0, 0, 0]
+NEW_WORD = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 
 def f1(first, second):
